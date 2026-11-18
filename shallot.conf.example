@@ -1,0 +1,47 @@
+# Shallot configuration.
+# Copy to /mnt/SDCARD/App/Shallot/shallot.conf and fill in.
+# Values are single-quoted; keep the quotes.
+
+# Your RomM server URL (no trailing slash needed).
+ROMM_URL='https://romm.example.com'
+
+# Client API token from RomM (Profile -> Client API Tokens), starts with rmm_
+ROMM_TOKEN='rmm_XXXXXXXXXXXX'
+
+# Device id created by `shallot.sh register Miyoo` (leave empty until then).
+DEVICE_ID=''
+
+# Where your ROMs live on the SD card.
+ROMS_DIR='/mnt/SDCARD/Roms'
+
+# Save file extensions to sync, space separated.
+SAVE_EXTS='srm sav'
+
+# Slot name used in RomM for every synced save (keep 'autosave' unless you know why not).
+SAVE_SLOT='autosave'
+
+# Conflict policy when the same save changed on both the console and the server:
+#   local  -> the console copy wins and is pushed to RomM (RomM keeps history)
+#   remote -> the server copy wins and replaces the console copy (local is backed up first)
+CONFLICT_POLICY='local'
+
+# Keep a local backup of every save before it is overwritten (1 = yes, 0 = no).
+BACKUPS='1'
+
+# How many daily backups to keep per save file.
+KEEP_BACKUPS='3'
+
+# RomM-side version retention per slot (autocleanup).
+AUTOCLEANUP_LIMIT='10'
+
+# How long (seconds) the ROM-id map is cached before refetching.
+ROMMAP_TTL='86400'
+
+# HTTP timeout in seconds (be generous on hotel/guest wifi).
+CURL_TIMEOUT='20'
+
+# RomM download endpoint template (%id% is replaced with the rom id).
+DOWNLOAD_PATH='/api/roms/%id%/download'
+
+# Extra curl flags (unquoted, one line), e.g. CURL_EXTRA='--no-check-certificate'
+CURL_EXTRA=''
