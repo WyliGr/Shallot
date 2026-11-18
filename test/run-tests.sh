@@ -183,6 +183,36 @@ code=$?
 assert_eq "bad token fails loudly" "${code}" "1"
 assert_contains "bad token message" "${out}" "negotiate failed"
 
+# 11. installer wires app + hook on a fake SD --------------------------------
+FAKE="${T}/fakesd"
+mkdir -p "${FAKE}/.tmp_update/script/network" "${FAKE}/Roms"
+printf '#!/bin/sh\nsysdir=/mnt/SDCARD/.tmp_update\nmain() { echo net "$1"; }\nmain "$@"\n' \
+    > "${FAKE}/.tmp_update/script/network/update_networking.sh"
+out=$(SHALLOT_FAKE_SD="${FAKE}" sh "${REPO}/install.sh" --url "http://127.0.0.1:${PORT}" --token rmm_testtoken123 2>&1)
+[ -f "${FAKE}/App/Shallot/config.json" ] && ok "installer created Apps entry" || fail "no Apps entry"
+[ -f "${FAKE}/App/Shallot/shallot.conf" ] && ok "installer created shallot.conf" || fail "no shallot.conf"
+assert_contains "installer registered the device" \
+    "$(grep '^DEVICE_ID' "${FAKE}/App/Shallot/shallot.conf")" "dev-miyoo"
+n_hooks=$(grep -c "shallot:auto-sync (added by Shallot installer)" \
+    "${FAKE}/.tmp_update/script/network/update_networking.sh")
+assert_eq "hook installed exactly once" "${n_hooks}" "1"
+[ -f "${FAKE}/App/Shallot/data/autosync.enabled" ] && ok "autosync enabled by default" || fail "autosync flag missing"
+
+# 12. idempotent re-run -------------------------------------------------------
+SHALLOT_FAKE_SD="${FAKE}" sh "${REPO}/install.sh" --url "http://127.0.0.1:${PORT}" --token rmm_testtoken123 >/dev/null 2>&1
+n_hooks=$(grep -c "shallot:auto-sync (added by Shallot installer)" \
+    "${FAKE}/.tmp_update/script/network/update_networking.sh")
+assert_eq "re-run does not duplicate the hook" "${n_hooks}" "1"
+
+# 13. uninstall removes the hook, keeps data; purge deletes everything -------
+SHALLOT_FAKE_SD="${FAKE}" sh "${REPO}/uninstall.sh" >/dev/null 2>&1
+n_hooks=$(grep -c "shallot:auto-sync" "${FAKE}/.tmp_update/script/network/update_networking.sh")
+assert_eq "uninstall removed the hook" "${n_hooks}" "0"
+[ ! -f "${FAKE}/App/Shallot/config.json" ] && ok "uninstall removed Apps entry" || fail "Apps entry still there"
+[ -f "${FAKE}/App/Shallot/shallot.conf" ] && ok "uninstall kept config" || fail "config deleted without purge"
+SHALLOT_FAKE_SD="${FAKE}" sh "${REPO}/uninstall.sh" --purge >/dev/null 2>&1
+[ ! -d "${FAKE}/App/Shallot" ] && ok "purge deleted the app dir" || fail "app dir still present"
+
 # ---------------------------------------------------------------------------
 printf '\n== results: %d passed, %d failed ==\n' "${PASS}" "${FAIL}"
 [ "${FAIL}" -eq 0 ]
