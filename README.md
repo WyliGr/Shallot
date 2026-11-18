@@ -45,10 +45,10 @@ Then edit `/mnt/SDCARD/App/Shallot/shallot.conf` (server URL + token) and run th
 | Path | What it is |
 |---|---|
 | `shallot.sh` | The sync engine (POSIX sh, runs on the Miyoo and on any Linux box for testing) |
-| `shallot-ui.sh` | Onion Apps menu entry (interactive terminal UI) |
-| `install.sh` / `uninstall.sh` | Wire / unwire the app and the auto-sync hook |
+| `shallot-app.sh` + `launch.sh` | The Apps-menu entry (one-shot: sync + ROM installs + `report.txt`) |
+| `install.sh` / `uninstall.sh` | Wire / unwire the app and the auto-sync hook (idempotent) |
 | `shallot.conf.example` | Annotated configuration template |
-| `docs/` | Setup, configuration, troubleshooting |
+| `docs/` | Setup, RomM-side setup, configuration, troubleshooting |
 | `test/` | A mock RomM server + POSIX test suite (no hardware needed) |
 
 ## Contributing / agents

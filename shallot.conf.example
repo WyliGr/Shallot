@@ -42,3 +42,6 @@ CURL_TIMEOUT='20'
 
 # RomM download endpoint template (%id% is replaced with the rom id).
 DOWNLOAD_PATH='/api/roms/%id%/download'
+
+# Extra curl flags (unquoted, one line), e.g. CURL_EXTRA='--no-check-certificate'
+CURL_EXTRA=''

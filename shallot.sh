@@ -45,6 +45,7 @@ KEEP_BACKUPS="${KEEP_BACKUPS:-3}"
 AUTOCLEANUP_LIMIT="${AUTOCLEANUP_LIMIT:-10}"
 ROMMAP_TTL="${ROMMAP_TTL:-86400}"
 CURL_TIMEOUT="${CURL_TIMEOUT:-20}"
+CURL_EXTRA="${CURL_EXTRA:-}"   # extra curl flags (unquoted), e.g. --no-check-certificate
 DOWNLOAD_PATH="${DOWNLOAD_PATH:-/api/roms/%id%/download}"
 AUTOSYNC_FLAG="${STATE}/autosync.enabled"
 
@@ -90,14 +91,14 @@ http_req() { # http_req METHOD PATH [BODY_FILE] [extra curl args...]
     url="${ROMM_URL%/}${path}"
     hdr="Authorization: Bearer ${ROMM_TOKEN}"
     if [ -n "${body}" ]; then
-        code=$("$CURL" -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
+        code=$("$CURL" ${CURL_EXTRA} -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
             -H "${hdr}" -H 'Content-Type: application/json' \
             --data-binary "@${body}" -X "${method}" "$@" "${url}")
     elif [ "${method}" = "GET" ]; then
-        code=$("$CURL" -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
+        code=$("$CURL" ${CURL_EXTRA} -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
             -H "${hdr}" "$@" "${url}")
     else
-        code=$("$CURL" -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
+        code=$("$CURL" ${CURL_EXTRA} -sS -m "${CURL_TIMEOUT}" -o "${HTTP_RESP_FILE}" -w '%{http_code}' \
             -H "${hdr}" -X "${method}" "$@" "${url}")
     fi
     printf '%s' "$code"
