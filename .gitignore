@@ -1,0 +1,11 @@
+# Shallot test artifacts
+test/tmp/
+*.log.bak
+
+# local configs carrying real tokens
+shallot.conf
+*.conf.local
+
+# OS cruft
+.DS_Store
+Thumbs.db
